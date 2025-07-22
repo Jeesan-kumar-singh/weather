@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f3;
+      padding: 40px;
+      text-align: center;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    .weather-result {
+      margin-top: 20px;
+      padding: 20px;
+      background: #fff;
+      display: inline-block;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🌤️ Weather Checker</h1>
+  <input type="text" id="cityInput" placeholder="Enter city name" />
+  <button onclick="getWeather()">Get Weather</button>
+
+  <div class="weather-result" id="weatherResult" style="display: none;">
+    <h2 id="location"></h2>
+    <p id="temp"></p>
+    <p id="condition"></p>
+    <p id="humidity"></p>
+    <p id="wind"></p>
+    <p id="airQuality"></p>
+  </div>
+
+  <script>
+    async function getWeather() {
+      const city = document.getElementById('cityInput').value;
+      const resultDiv = document.getElementById('weatherResult');
+
+      if (!city) {
+        alert("Please enter a city name");
+        return;
+      }
+
+      const url = `https://api.weatherapi.com/v1/current.json?key=2e60643712b94c0dbca105813252107&q=${encodeURIComponent(city)}&aqi=yes`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+          alert("Error: " + data.error.message);
+          resultDiv.style.display = 'none';
+          return;
+        }
+
+        document.getElementById('location').textContent = `${data.location.name}, ${data.location.country}`;
+        document.getElementById('temp').textContent = `Temperature: ${data.current.temp_c}°C`;
+        document.getElementById('condition').textContent = `Condition: ${data.current.condition.text}`;
+        document.getElementById('humidity').textContent = `Humidity: ${data.current.humidity}%`;
+        document.getElementById('wind').textContent = `Wind: ${data.current.wind_kph} km/h`;
+        document.getElementById('airQuality').textContent = `AQI (PM2.5): ${data.current.air_quality.pm2_5.toFixed(2)}`;
+
+        resultDiv.style.display = 'block';
+
+      } catch (error) {
+        alert("Failed to fetch weather data.");
+        console.error(error);
+        resultDiv.style.display = 'none';
+      }
+    }
+  </script>
+
+</body>
+</html>
